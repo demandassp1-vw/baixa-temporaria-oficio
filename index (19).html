@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baixa Temporária por Ofício</title>
+<style>
+  :root{
+    --navy: #1E3A5F;
+    --navy-dark: #142A45;
+    --teal: #3B7D82;
+    --paper: #FFFFFF;
+    --paper-edge: #D7DEE6;
+    --bg: #EEF1F5;
+    --ink: #23303F;
+    --muted: #64748B;
+    --field-empty: #B45309;
+    --danger: #B3261E;
+    --ok: #1E7A4C;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  header.top{
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
+    color: #fff;
+    padding: 28px 24px 24px;
+  }
+  header.top .wrap{
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  header.top .eyebrow{
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-size: 11px;
+    color: #9FC0D0;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  header.top h1{
+    margin: 0 0 6px;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  header.top p{
+    margin: 0;
+    color: #CBD8E4;
+    font-size: 14px;
+    max-width: 640px;
+    line-height: 1.5;
+  }
+
+  .steps{
+    display:flex;
+    gap: 18px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .steps .step{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    font-size: 13px;
+    color: #DCE7EF;
+  }
+  .steps .num{
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.3);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 11px; font-weight: 700;
+  }
+
+  main{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 24px 80px;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  @media (max-width: 900px){
+    main{ grid-template-columns: 1fr; }
+  }
+
+  .panel{
+    background: var(--paper);
+    border: 1px solid var(--paper-edge);
+    border-radius: 10px;
+    padding: 20px;
+    position: sticky;
+    top: 20px;
+  }
+  @media (max-width: 900px){
+    .panel{ position: static; }
+  }
+
+  .panel h2{
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--teal);
+    margin: 0 0 4px;
+    font-weight: 700;
+  }
+  .panel .sub{
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0 0 16px;
+  }
+
+  fieldset{
+    border: none;
+    margin: 0 0 18px;
+    padding: 0;
+  }
+  fieldset legend{
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--navy);
+    padding: 0 0 8px;
+    border-bottom: 1px solid #EEF1F5;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  label{
+    display:block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .field{ margin-bottom: 14px; }
+  .field small{
+    display:block;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+  input[type=text]{
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    font-size: 13.5px;
+    font-family: inherit;
+    color: var(--ink);
+    background: #FBFCFD;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input[type=text]:focus{
+    outline: none;
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(59,125,130,.15);
+    background: #fff;
+  }
+  input[type=text].filled{ border-color: #9CC7A1; background: #F5FBF6; }
+
+  .copy-link{
+    background: none;
+    border: none;
+    color: var(--teal);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 3px;
+  }
+  .copy-link:hover{ text-decoration: underline; }
+
+  .actions{
+    display:flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  button.primary{
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    padding: 13px 16px;
+    border-radius: 8px;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: 8px;
+    transition: background .15s, transform .05s;
+  }
+  button.primary:hover{ background: var(--navy-dark); }
+  button.primary:active{ transform: translateY(1px); }
+
+  button.secondary{
+    background: none;
+    border: 1px solid #CBD5E1;
+    color: var(--ink);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button.secondary:hover{ background: #F5F7FA; }
+
+  .status-line{
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 10px;
+    text-align: center;
+  }
+  .status-line strong{ color: var(--ok); }
+
+  /* ---------- Document preview ---------- */
+  .sheet-wrap{
+    overflow-x: auto;
+    padding: 4px;
+  }
+  .sheet{
+    background: var(--paper);
+    width: 8.5in;
+    min-height: 11in;
+    margin: 0 auto;
+    box-shadow: 0 2px 6px rgba(20,30,50,.08), 0 12px 30px rgba(20,30,50,.10);
+    border: 1px solid var(--paper-edge);
+    padding: 1in 1.25in;
+    font-family: Cambria, Georgia, "Times New Roman", serif;
+    font-size: 11pt;
+    line-height: 1.32;
+    color: #111;
+  }
+
+  .sheet .title{
+    text-align: center;
+    font-weight: 700;
+    font-size: 14pt;
+    margin: 0 0 24pt;
+  }
+
+  .sheet p.body-text{
+    text-align: justify;
+    margin: 0 0 18pt;
+  }
+
+  .sheet .section-label{
+    font-weight: 700;
+    text-decoration: underline;
+    margin: 0 0 10pt;
+  }
+
+  .sheet .vehicle-line{
+    margin: 0 0 3pt;
+  }
+  .sheet .vehicle-line b{ font-weight: 700; }
+
+  .sheet .sign-gap{ height: 60pt; }
+
+  .sheet .sign-rule{
+    text-align: center;
+    letter-spacing: 1px;
+    margin: 0;
+  }
+  .sheet .sign-name{
+    text-align: center;
+    font-weight: 700;
+    margin: 2pt 0 0;
+  }
+
+  .ph{ color: var(--field-empty); font-style: italic; }
+
+  /* ---------- Print ---------- */
+  @media print{
+    body{ margin: 0; background: #fff; }
+    header.top{ display: none; }
+    main{ display: block; padding: 0; margin: 0; max-width: none; }
+    .panel{ display: none; }
+    .sheet-wrap{ overflow: visible; padding: 0; }
+    .sheet{
+      margin: 0;
+      box-shadow: none;
+      border: none;
+    }
+    @page{ size: letter; margin: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">Documento &middot; DETRAN</div>
+    <h1>Baixa Temporária por Ofício</h1>
+    <p>Preencha os dados abaixo para gerar o Requerimento de Solicitação de Desbloqueio, pronto para impressão em PDF.</p>
+    <div class="steps">
+      <div class="step"><span class="num">1</span> Preencha os campos</div>
+      <div class="step"><span class="num">2</span> Confira o documento ao lado</div>
+      <div class="step"><span class="num">3</span> Clique em Imprimir / Salvar PDF</div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>Dados para preenchimento</h2>
+    <p class="sub">Os campos entre colchetes no documento são atualizados automaticamente conforme você digita.</p>
+
+    <form id="form-dados" autocomplete="off">
+      <fieldset>
+        <legend>Dados da loja</legend>
+
+        <div class="field">
+          <label for="nome_loja">Nome da loja</label>
+          <input type="text" id="nome_loja" data-target="nome_loja" placeholder="Ex.: Auto Center Silva Ltda">
+        </div>
+
+        <div class="field">
+          <label for="endereco_loja">Endereço da loja</label>
+          <input type="text" id="endereco_loja" data-target="endereco_loja" placeholder="Ex.: Rua das Palmeiras, 123, Vila Mariana">
+          <small>A cidade/UF (São Paulo, SP) já está fixa no texto do documento.</small>
+        </div>
+
+        <div class="field">
+          <label for="cnpj_loja">CNPJ da loja</label>
+          <input type="text" id="cnpj_loja" data-target="cnpj_loja" placeholder="Ex.: 12.345.678/0001-90">
+        </div>
+
+        <div class="field">
+          <label for="razao_social">Razão social da loja (assinatura)</label>
+          <input type="text" id="razao_social" data-target="razao_social" placeholder="Ex.: Auto Center Silva Ltda">
+          <button type="button" class="copy-link" id="btn-copiar-nome">usar o mesmo nome da loja acima</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Dados do veículo</legend>
+
+        <div class="field">
+          <label for="marca_modelo">Marca e modelo</label>
+          <input type="text" id="marca_modelo" data-target="marca_modelo" placeholder="Ex.: Fiat Argo 1.0">
+        </div>
+
+        <div class="field">
+          <label for="chassi">Chassi</label>
+          <input type="text" id="chassi" data-target="chassi" placeholder="Ex.: 9BWZZZ377VT004251">
+        </div>
+
+        <div class="field">
+          <label for="renavam">Renavam</label>
+          <input type="text" id="renavam" data-target="renavam" placeholder="Ex.: 00123456789">
+        </div>
+
+        <div class="field">
+          <label for="placa">Placa</label>
+          <input type="text" id="placa" data-target="placa" placeholder="Ex.: ABC1D23">
+        </div>
+      </fieldset>
+
+      <div class="actions">
+        <button type="button" class="primary" id="btn-imprimir">🖨️ Imprimir / Salvar PDF</button>
+        <button type="button" class="secondary" id="btn-limpar">Limpar campos</button>
+      </div>
+      <div class="status-line" id="status-line">Os dados ficam salvos apenas neste navegador.</div>
+    </form>
+  </section>
+
+  <section class="sheet-wrap">
+    <div class="sheet" id="sheet">
+      <p class="title">REQUERIMENTO DE SOLICITAÇÃO DE DESBLOQUEIO</p>
+
+      <p class="body-text">
+        A&nbsp;<span class="out" data-field="nome_loja" data-ph="[nome da loja]">[nome da loja]</span>, pessoa jurídica de direito privado, com sede na
+        <span class="out" data-field="endereco_loja" data-ph="[endereço da loja]">[endereço da loja]</span>, São Paulo, SP, inscrita no CNPJ
+        <span class="out" data-field="cnpj_loja" data-ph="[cnpj da loja]">[cnpj da loja]</span>, neste ato devidamente representada nos precisos termos de seu Contrato Social, cuja cópia simples passa a integrar este documento, assume a total responsabilidade pela venda irregular do veículo realizada antes do registro de transferência de propriedade em seu nome junto ao DETRAN, solicitando o Desbloqueio do Cancelamento do gravame constante para o veículo descrito abaixo por motivo de sequência de notas (dupla transferência).
+      </p>
+
+      <p class="section-label">DADOS DO VEÍCULO :</p>
+
+      <p class="vehicle-line"><b>MARCA :</b> <span class="out" data-field="marca_modelo" data-ph="[marca e modelo do carro]">[marca e modelo do carro]</span></p>
+      <p class="vehicle-line"><b>CHASSI :</b> <span class="out" data-field="chassi" data-ph="[chassi do carro]">[chassi do carro]</span></p>
+      <p class="vehicle-line"><b>RENAVAM :</b> <span class="out" data-field="renavam" data-ph="[renavam do carro]">[renavam do carro]</span></p>
+      <p class="vehicle-line"><b>PLACA :</b> <span class="out" data-field="placa" data-ph="[placa do carro]">[placa do carro]</span></p>
+
+      <div class="sign-gap"></div>
+
+      <p class="sign-rule">_________________________________________________</p>
+      <p class="sign-name"><span class="out" data-field="razao_social" data-ph="[razão social da loja]">[razão social da loja]</span></p>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+  var FIELDS = ["nome_loja","endereco_loja","cnpj_loja","razao_social","marca_modelo","chassi","renavam","placa"];
+  var STORAGE_KEY = "baixa-temporaria-oficio-v1";
+
+  function loadSaved(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    }catch(e){ return {}; }
+  }
+
+  function save(data){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
+  }
+
+  function currentData(){
+    var data = {};
+    FIELDS.forEach(function(f){
+      data[f] = document.getElementById(f).value;
+    });
+    return data;
+  }
+
+  function render(){
+    var data = currentData();
+    FIELDS.forEach(function(f){
+      var input = document.getElementById(f);
+      var out = document.querySelector('.out[data-field="' + f + '"]');
+      var val = data[f] ? data[f].trim() : "";
+      if(val){
+        out.textContent = val;
+        out.classList.remove("ph");
+        input.classList.add("filled");
+      } else {
+        out.textContent = out.getAttribute("data-ph");
+        out.classList.add("ph");
+        input.classList.remove("filled");
+      }
+    });
+    save(data);
+    updateStatus(data);
+  }
+
+  function updateStatus(data){
+    var filled = FIELDS.filter(function(f){ return data[f] && data[f].trim(); }).length;
+    var line = document.getElementById("status-line");
+    if(filled === 0){
+      line.innerHTML = "Os dados ficam salvos apenas neste navegador.";
+    } else if(filled === FIELDS.length){
+      line.innerHTML = "<strong>Todos os campos preenchidos.</strong> Pronto para imprimir.";
+    } else {
+      line.innerHTML = filled + " de " + FIELDS.length + " campos preenchidos.";
+    }
+  }
+
+  function init(){
+    var saved = loadSaved();
+    FIELDS.forEach(function(f){
+      var input = document.getElementById(f);
+      if(saved[f]) input.value = saved[f];
+      input.addEventListener("input", render);
+    });
+    render();
+
+    document.getElementById("btn-copiar-nome").addEventListener("click", function(){
+      document.getElementById("razao_social").value = document.getElementById("nome_loja").value;
+      render();
+    });
+
+    document.getElementById("btn-limpar").addEventListener("click", function(){
+      if(!confirm("Limpar todos os campos preenchidos?")) return;
+      FIELDS.forEach(function(f){ document.getElementById(f).value = ""; });
+      render();
+    });
+
+    document.getElementById("btn-imprimir").addEventListener("click", function(){
+      window.print();
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+})();
+</script>
+
+</body>
+</html>
