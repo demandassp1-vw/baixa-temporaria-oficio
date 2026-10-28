@@ -9,6 +9,7 @@
     --navy: #1E3A5F;
     --navy-dark: #142A45;
     --teal: #3B7D82;
+    --teal-dark: #2F6569;
     --paper: #FFFFFF;
     --paper-edge: #D7DEE6;
     --bg: #EEF1F5;
@@ -102,9 +103,11 @@
     padding: 20px;
     position: sticky;
     top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
   }
   @media (max-width: 900px){
-    .panel{ position: static; }
+    .panel{ position: static; max-height: none; overflow: visible; }
   }
 
   .panel h2{
@@ -169,6 +172,14 @@
   }
   input[type=text].filled{ border-color: #9CC7A1; background: #F5FBF6; }
 
+  input[type=text].flash{
+    animation: flash 1.2s ease-out;
+  }
+  @keyframes flash{
+    0%{ box-shadow: 0 0 0 4px rgba(30,122,76,.35); }
+    100%{ box-shadow: 0 0 0 0 rgba(30,122,76,0); }
+  }
+
   .copy-link{
     background: none;
     border: none;
@@ -180,6 +191,76 @@
     margin-top: 3px;
   }
   .copy-link:hover{ text-decoration: underline; }
+
+  /* ---------- Importar comprovante CNPJ ---------- */
+  .import-box{
+    border: 1.5px dashed #C3CFDB;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background: #FAFCFD;
+  }
+  .import-box h3{
+    margin: 0 0 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .import-box p{
+    margin: 0 0 12px;
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .import-box textarea{
+    width: 100%;
+    min-height: 110px;
+    resize: vertical;
+    padding: 10px;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-family: inherit;
+    color: var(--ink);
+    background: #fff;
+    line-height: 1.45;
+  }
+  .import-box textarea:focus{
+    outline: none;
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(59,125,130,.15);
+  }
+  button.teal{
+    width: 100%;
+    margin-top: 10px;
+    background: var(--teal);
+    color: #fff;
+    border: none;
+    padding: 11px 14px;
+    border-radius: 7px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: 8px;
+    transition: background .15s, transform .05s;
+  }
+  button.teal:hover{ background: var(--teal-dark); }
+  button.teal:active{ transform: translateY(1px); }
+
+  .import-msg{
+    display: none;
+    margin-top: 10px;
+    font-size: 11.5px;
+    line-height: 1.45;
+    padding: 8px 10px;
+    border-radius: 6px;
+  }
+  .import-msg.ok{ display:block; background: #EAF6EF; color: var(--ok); border: 1px solid #BFE0CC; }
+  .import-msg.warn{ display:block; background: #FDF4E7; color: #8A4B08; border: 1px solid #F1D3A6; }
+  .import-msg.err{ display:block; background: #FBECEB; color: var(--danger); border: 1px solid #EFC2BF; }
 
   .actions{
     display:flex;
@@ -320,7 +401,15 @@
 
     <form id="form-dados" autocomplete="off">
       <fieldset>
-        <legend>Dados da loja</legend>
+        <legend>Dados da empresa (assinatura)</legend>
+
+        <div class="import-box">
+          <h3>Colar Comprovante de CNPJ (Receita Federal)</h3>
+          <p>Copie o texto do comprovante de inscrição da Receita Federal e cole abaixo. Depois clique em "Puxar dados".</p>
+          <textarea id="cnpj_texto" placeholder="Cole aqui o texto do Comprovante de Inscrição e de Situação Cadastral..."></textarea>
+          <button type="button" class="teal" id="btn-puxar">🔎 Puxar dados automaticamente</button>
+          <div class="import-msg" id="import-msg"></div>
+        </div>
 
         <div class="field">
           <label for="nome_loja">Nome da loja</label>
@@ -329,8 +418,8 @@
 
         <div class="field">
           <label for="endereco_loja">Endereço da loja</label>
-          <input type="text" id="endereco_loja" data-target="endereco_loja" placeholder="Ex.: Rua das Palmeiras, 123, Vila Mariana">
-          <small>A cidade/UF (São Paulo, SP) já está fixa no texto do documento.</small>
+          <input type="text" id="endereco_loja" data-target="endereco_loja" placeholder="Ex.: Rua das Palmeiras, 123, Vila Mariana, São Paulo - SP, CEP 04000-000">
+          <small>Rua, número, bairro, cidade, estado e CEP.</small>
         </div>
 
         <div class="field">
@@ -383,7 +472,7 @@
 
       <p class="body-text">
         A&nbsp;<span class="out" data-field="nome_loja" data-ph="[nome da loja]">[nome da loja]</span>, pessoa jurídica de direito privado, com sede na
-        <span class="out" data-field="endereco_loja" data-ph="[endereço da loja]">[endereço da loja]</span>, São Paulo, SP, inscrita no CNPJ
+        <span class="out" data-field="endereco_loja" data-ph="[endereço da loja]">[endereço da loja]</span>, inscrita no CNPJ
         <span class="out" data-field="cnpj_loja" data-ph="[cnpj da loja]">[cnpj da loja]</span>, neste ato devidamente representada nos precisos termos de seu Contrato Social, cuja cópia simples passa a integrar este documento, assume a total responsabilidade pela venda irregular do veículo realizada antes do registro de transferência de propriedade em seu nome junto ao DETRAN, solicitando o Desbloqueio do Cancelamento do gravame constante para o veículo descrito abaixo por motivo de sequência de notas (dupla transferência).
       </p>
 
@@ -403,6 +492,176 @@
 </main>
 
 <script>
+/* ============================================================
+   Leitura do Comprovante de Inscrição (CNPJ - Receita Federal)
+   ============================================================ */
+var ComprovanteCNPJ = (function(){
+
+  // Rótulos que aparecem no comprovante (normalizados: sem acento, maiúsculo)
+  var LABELS = [
+    "REPUBLICA FEDERATIVA DO BRASIL",
+    "CADASTRO NACIONAL DA PESSOA JURIDICA",
+    "COMPROVANTE DE INSCRICAO E DE SITUACAO CADASTRAL",
+    "NUMERO DE INSCRICAO",
+    "MATRIZ",
+    "FILIAL",
+    "DATA DE ABERTURA",
+    "NOME EMPRESARIAL",
+    "TITULO DO ESTABELECIMENTO (NOME DE FANTASIA)",
+    "NOME FANTASIA",
+    "PORTE",
+    "CODIGO E DESCRICAO DA ATIVIDADE ECONOMICA PRINCIPAL",
+    "CODIGO E DESCRICAO DAS ATIVIDADES ECONOMICAS SECUNDARIAS",
+    "CODIGO E DESCRICAO DA NATUREZA JURIDICA",
+    "LOGRADOURO",
+    "NUMERO",
+    "COMPLEMENTO",
+    "CEP",
+    "BAIRRO/DISTRITO",
+    "BAIRRO",
+    "MUNICIPIO",
+    "UF",
+    "ENDERECO ELETRONICO",
+    "TELEFONE",
+    "ENTE FEDERATIVO RESPONSAVEL (EFR)",
+    "SITUACAO CADASTRAL",
+    "DATA DA SITUACAO CADASTRAL",
+    "MOTIVO DE SITUACAO CADASTRAL",
+    "SITUACAO ESPECIAL",
+    "DATA DA SITUACAO ESPECIAL"
+  ];
+
+  // Ordena do maior para o menor, para "NUMERO DE INSCRICAO" ganhar de "NUMERO"
+  var LABELS_SORTED = LABELS.slice().sort(function(a,b){ return b.length - a.length; });
+
+  function norm(s){
+    return String(s)
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .toUpperCase()
+      .replace(/\s*\/\s*/g, "/")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function isEmptyValue(v){
+    return !v || /^[\*\s\-]+$/.test(v);   // "********" ou vazio
+  }
+
+  // Lê o texto colado e devolve um mapa { ROTULO: [linhas de valor] }
+  function parseBlocks(text){
+    var lines = String(text)
+      .replace(/\r/g, "")
+      .split(/\n|\t/)
+      .map(function(l){ return l.replace(/\u00A0/g, " ").trim(); })
+      .filter(Boolean);
+
+    var map = {};
+    var current = null;
+
+    lines.forEach(function(line){
+      var key = norm(line).replace(/:$/, "");
+
+      // Linha é exatamente um rótulo
+      if (LABELS.indexOf(key) !== -1){
+        current = key;
+        if (!map[current]) map[current] = [];
+        return;
+      }
+
+      // Linha no formato "ROTULO: valor"
+      for (var i = 0; i < LABELS_SORTED.length; i++){
+        var lb = LABELS_SORTED[i];
+        if (key.indexOf(lb + ":") === 0){
+          current = lb;
+          if (!map[current]) map[current] = [];
+          var rest = line.slice(line.indexOf(":") + 1).trim();
+          if (rest) map[current].push(rest);
+          return;
+        }
+      }
+
+      if (current) map[current].push(line);
+    });
+
+    return map;
+  }
+
+  function first(map, keys){
+    for (var i = 0; i < keys.length; i++){
+      var vals = map[keys[i]];
+      if (vals){
+        for (var j = 0; j < vals.length; j++){
+          if (!isEmptyValue(vals[j])) return vals[j].trim();
+        }
+      }
+    }
+    return "";
+  }
+
+  function formatCNPJ(raw){
+    var d = String(raw).replace(/\D/g, "");
+    if (d.length !== 14) return raw.trim();
+    return d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
+  }
+
+  function formatCEP(raw){
+    var d = String(raw).replace(/\D/g, "");
+    if (d.length !== 8) return raw.trim();
+    return d.replace(/^(\d{5})(\d{3})$/, "$1-$2");
+  }
+
+  function extract(text){
+    var map = parseBlocks(text);
+
+    // CNPJ: pelo rótulo ou, em último caso, pelo primeiro CNPJ encontrado no texto
+    var cnpj = first(map, ["NUMERO DE INSCRICAO"]);
+    var cnpjMatch = (cnpj || text).match(/\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}/);
+    cnpj = cnpjMatch ? formatCNPJ(cnpjMatch[0]) : "";
+
+    var razao       = first(map, ["NOME EMPRESARIAL"]);
+    var fantasia    = first(map, ["TITULO DO ESTABELECIMENTO (NOME DE FANTASIA)", "NOME FANTASIA"]);
+    var logradouro  = first(map, ["LOGRADOURO"]);
+    var numero      = first(map, ["NUMERO"]);
+    var complemento = first(map, ["COMPLEMENTO"]);
+    var bairro      = first(map, ["BAIRRO/DISTRITO", "BAIRRO"]);
+    var municipio   = first(map, ["MUNICIPIO"]);
+    var uf          = first(map, ["UF"]);
+    var cep         = first(map, ["CEP"]);
+
+    // Monta: Rua, Número, Complemento, Bairro, Cidade - UF, CEP 00000-000
+    var partes = [];
+    if (logradouro) partes.push(logradouro);
+    if (numero) partes.push(numero);
+    if (complemento) partes.push(complemento);
+    if (bairro) partes.push(bairro);
+    var cidadeUf = [municipio, uf].filter(Boolean).join(" - ");
+    if (cidadeUf) partes.push(cidadeUf);
+    if (cep) partes.push("CEP " + formatCEP(cep));
+
+    return {
+      cnpj: cnpj,
+      razao: razao,
+      fantasia: fantasia,
+      endereco: partes.join(", "),
+      faltando: [
+        !razao && "nome empresarial",
+        !cnpj && "CNPJ",
+        !logradouro && "logradouro",
+        !numero && "número",
+        !bairro && "bairro",
+        !municipio && "município",
+        !uf && "UF",
+        !cep && "CEP"
+      ].filter(Boolean)
+    };
+  }
+
+  return { extract: extract };
+})();
+
+/* ============================================================
+   Formulário e pré-visualização do documento
+   ============================================================ */
 (function(){
   var FIELDS = ["nome_loja","endereco_loja","cnpj_loja","razao_social","marca_modelo","chassi","renavam","placa"];
   var STORAGE_KEY = "baixa-temporaria-oficio-v1";
@@ -458,6 +717,48 @@
     }
   }
 
+  function setField(id, value){
+    if(!value) return false;
+    var input = document.getElementById(id);
+    input.value = value;
+    input.classList.remove("flash");
+    void input.offsetWidth;            // reinicia a animação
+    input.classList.add("flash");
+    return true;
+  }
+
+  function showMsg(type, html){
+    var box = document.getElementById("import-msg");
+    box.className = "import-msg " + type;
+    box.innerHTML = html;
+  }
+
+  function puxarDados(){
+    var texto = document.getElementById("cnpj_texto").value;
+    if(!texto.trim()){
+      showMsg("err", "Cole o texto do comprovante antes de clicar em puxar dados.");
+      return;
+    }
+
+    var d = ComprovanteCNPJ.extract(texto);
+    var preenchidos = 0;
+
+    if(setField("nome_loja", d.razao)) preenchidos++;
+    if(setField("razao_social", d.razao)) preenchidos++;
+    if(setField("cnpj_loja", d.cnpj)) preenchidos++;
+    if(setField("endereco_loja", d.endereco)) preenchidos++;
+
+    render();
+
+    if(preenchidos === 0){
+      showMsg("err", "Não encontrei os dados no texto colado. Confira se copiou o comprovante completo da Receita Federal.");
+    } else if(d.faltando.length){
+      showMsg("warn", "<strong>" + preenchidos + " campos preenchidos.</strong> Não encontrei: " + d.faltando.join(", ") + ". Confira e complete manualmente.");
+    } else {
+      showMsg("ok", "<strong>Dados puxados com sucesso.</strong> Confira o documento ao lado.");
+    }
+  }
+
   function init(){
     var saved = loadSaved();
     FIELDS.forEach(function(f){
@@ -467,6 +768,8 @@
     });
     render();
 
+    document.getElementById("btn-puxar").addEventListener("click", puxarDados);
+
     document.getElementById("btn-copiar-nome").addEventListener("click", function(){
       document.getElementById("razao_social").value = document.getElementById("nome_loja").value;
       render();
@@ -475,6 +778,8 @@
     document.getElementById("btn-limpar").addEventListener("click", function(){
       if(!confirm("Limpar todos os campos preenchidos?")) return;
       FIELDS.forEach(function(f){ document.getElementById(f).value = ""; });
+      document.getElementById("cnpj_texto").value = "";
+      document.getElementById("import-msg").className = "import-msg";
       render();
     });
 
